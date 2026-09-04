@@ -26,10 +26,21 @@ async def run_agent1():
     agent = create_agent(
         model,
         tools,
-        system_prompt="You are a web search agent with access to brightdata tool to get latest data"
+        system_prompt=(
+            "You are a web search agent with access to Bright Data tools. "
+            "Answer clearly and concisely. "
+            "For weather questions, use this exact format:\n\n"
+            "🌤️ Weather Report\n"
+            "📍 Location: ...\n"
+            "🌡️ Temperature: ...\n"
+            "☁️ Conditions: ...\n"
+            "💨 Wind: ...\n"
+            "🌧️ Forecast: ...\n\n"
+            "Do not use Markdown links or bullet points."
+        )
     )
     agent_response = await agent.ainvoke({"messages": "what is the weather in hannover?"})
-    print(agent_response["messages"][-1].content)
+    print(agent_response["messages"][-1].content) #take final answer only
 
 if __name__ == "__main__":
     asyncio.run(run_agent1())
