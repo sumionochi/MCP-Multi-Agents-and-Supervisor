@@ -1,5 +1,3 @@
-Readme · MD
-
 # DAX Multi-Agent Research
 
 A supervisor-led multi-agent system that researches German blue chip stocks using live web data pulled through the **Model Context Protocol (MCP)**.
@@ -12,7 +10,6 @@ Four specialized agents split the work: fundamentals, market data, news, and a f
   <img alt="MCP" src="https://img.shields.io/badge/MCP-stdio-6E56CF">
   <img alt="OpenAI" src="https://img.shields.io/badge/model-gpt--4o-412991?logo=openai&logoColor=white">
 </p>
----
  
 ## Table of contents
  
@@ -338,9 +335,3 @@ If you are on a low tokens-per-minute tier and still hit limits, lower `MAX_TOOL
 | `externally-managed-environment` on install | Virtualenv not activated | `source .venv/bin/activate` first |
 | Zone checks and 502 dumps in the output | MCP server logging to inherited stderr | Left redirected by default, set `SHOW_SERVER_LOGS=1` to inspect |
 | Wrong company's financials | Ambiguous search terms | Keep tickers in the supervisor prompt |
- 
----
- 
-## Disclaimer
- 
-This project is a demonstration of multi-agent orchestration and MCP tooling. Its output is automated research, not financial advice, and the figures it reports come from public web sources that may be incomplete or out of date. Do not make investment decisions based on it.
