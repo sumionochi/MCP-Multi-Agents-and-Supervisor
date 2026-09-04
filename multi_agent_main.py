@@ -93,7 +93,7 @@ async def run_agent1(query):
     )
     
     agent_response = await agent.ainvoke({"messages": "what is the weather in hannover?"})
-    print(agent_response["messages"][-1].content) #take final answer only
+    print(agent_response["messages"][-1].pretty_repr()) #take final answer only
 
 if __name__ == "__main__":
     asyncio.run(run_multi_agent1("Give me good stock recommendation from DAX"))
