@@ -21,7 +21,6 @@ Two Python entry points that show the same idea at two levels of ambition: givin
 - [Configuration](#configuration)
 - [What I learned](#what-i-learned)
 - [Troubleshooting](#troubleshooting)
-- [Disclaimer](#disclaimer)
 ---
  
 ## The progression
@@ -112,12 +111,15 @@ sequenceDiagram
 ## Part one: a single agent
  
 `main.py` is the smallest thing that proves the connection works: one agent, the Bright Data toolset, one question about live weather in Hannover, and a fixed output format enforced through the system prompt.
- 
+
 ```python
 agent = create_agent(model, tools, system_prompt="You are a web search agent ...")
 response = await agent.ainvoke({"messages": "what is the weather in hannover?"})
 print(response["messages"][-1].content)
 ```
+<img width="633" height="385" alt="Screenshot 2026-09-04 at 11 55 57 AM" src="https://github.com/user-attachments/assets/60d839e7-bfa2-4ad7-bf33-8db3e539cbed" />
+
+<img width="757" height="305" alt="Screenshot 2026-09-04 at 12 06 00 PM" src="https://github.com/user-attachments/assets/9a483540-4713-4984-b1a9-9f9c50ea4e74" />
  
 ```
 🌤️ Weather Report
@@ -196,6 +198,12 @@ sequenceDiagram
     S->>S: repeat for fundamentals and news
     S->>U: final comparison
 ```
+
+<img width="668" height="785" alt="Screenshot 2026-09-04 at 1 38 58 PM" src="https://github.com/user-attachments/assets/8e15a0ef-e346-4d9b-9f81-49a39ab3e28d" />
+
+<img width="657" height="277" alt="Screenshot 2026-09-04 at 2 08 55 PM" src="https://github.com/user-attachments/assets/73ca18bf-ff11-4bdc-b938-fca444d39259" />
+
+<img width="661" height="643" alt="Screenshot 2026-09-04 at 2 09 32 PM" src="https://github.com/user-attachments/assets/f6b6ab8f-ef1c-4631-a4a6-cf5cf7978d7f" />
  
 Because handoffs travel as ordinary messages, the run is fully inspectable. Printing `result["messages"]` shows every transfer, every tool call and every intermediate answer in order.
  
