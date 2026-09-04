@@ -5,10 +5,16 @@ from dotenv import load_dotenv
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
+from langgraph_supervisor import create_supervisor
 
-load_dotenv()   
+load_dotenv()
 
-async def run_agent1(query):
+
+def pretty_print_message(message):
+    print(message.pretty_repr())
+
+
+async def workspace(query):
     client = MultiServerMCPClient(
         {
             "Bright Data": {
@@ -17,13 +23,18 @@ async def run_agent1(query):
                 "env": {
                     "API_TOKEN": os.getenv("BRIGHT_DATA_API_TOKEN"),
                 },
-                "transport": "stdio", #stdio as local server only
+                "transport": "stdio",
             },
         }
     )
+
     tools = await client.get_tools()
-    model = init_chat_model(model="openai:gpt-4o", api_key = os.getenv("OPENAI_API_KEY"))
-    
+
+    model = init_chat_model(
+        model="openai:gpt-4o",
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
+
     stock_research_agent = create_agent(
         model,
         tools,
@@ -91,9 +102,69 @@ async def run_agent1(query):
         ),
         name="price_recommendation_agent",
     )
-    
-    agent_response = await agent.ainvoke({"messages": "what is the weather in hannover?"})
-    print(agent_response["messages"][-1].pretty_repr()) #take final answer only
+
+    supervisor = create_supervisor(
+        model=model,
+        agents=[
+            stock_research_agent,
+            market_data_agent,
+            news_analyst_agent,
+            price_recommendation_agent,
+        ],
+        prompt=(
+            "You are a supervisor managing four specialized financial agents.\n\n"
+
+            "Available agents:\n"
+            "- stock_research_agent: Research company fundamentals, "
+            "earnings, revenue, profitability, debt, and valuation.\n"
+            "- market_data_agent: Retrieve stock prices, market "
+            "capitalization, trading volume, and historical performance.\n"
+            "- news_analyst_agent: Find and analyze recent company "
+            "news and important market developments.\n"
+            "- price_recommendation_agent: Compare companies and "
+            "evaluate their relative attractiveness.\n\n"
+
+            "Instructions:\n"
+            "- Assign each task to the most suitable agent.\n"
+            "- Use one agent at a time. Do not call agents in parallel.\n"
+            "- Do not do the research yourself.\n"
+            "- After receiving the necessary research, ask the "
+            "price_recommendation_agent to prepare the final comparison.\n"
+            "- Return the final answer to the user.\n"
+            "- Do not invent financial figures or guarantee returns.\n"
+        ),
+        add_handoff_back_messages=True,
+        output_mode="full_history",
+    )
+
+    app = supervisor.compile()
+
+    return app
+
+
+async def run_multi_agent1(query):
+    app = await workspace(query)
+
+    result = await app.ainvoke(
+        {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": query,
+                }
+            ]
+        }
+    )
+
+    for message in result["messages"]:
+        pretty_print_message(message)
+
+    return result
+
 
 if __name__ == "__main__":
-    asyncio.run(run_multi_agent1("Give me good stock recommendation from DAX"))
+    asyncio.run(
+        run_multi_agent1(
+            "Give me good stock recommendations from DAX"
+        )
+    )
